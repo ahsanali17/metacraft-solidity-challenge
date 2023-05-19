@@ -85,7 +85,7 @@ contract CrowdFunding2 is Ownable, ReentrancyGuard {
         string calldata _description,
         uint _fundingGoalInEther,
         uint _durationInDays
-    ) external payable returns(uint eventId) {
+    ) external returns(uint eventId) {
         // Checking that the name and description are within a certain amount of characters to reduce gas costs.
         require(bytes(_name).length <= 100, "Name should be less than or equal to 100 characters");
         require(bytes(_description).length <= 1000, "Description should be less than or equal to 1000 characters");
@@ -150,7 +150,7 @@ contract CrowdFunding2 is Ownable, ReentrancyGuard {
     /// @notice User can only withdraw if the event has expired (reached it's deadline) and if the funding goal was not reached
     /// @dev The logic in this function is bound to be changed to give better options for the user to withdraw
     /// @param _eventId Is the ID of the event, produced during creation of event or retrieved by getAllEvents() & ongoingEvents
-    function withdrawContribution(uint64 _eventId) external payable nonReentrant {
+    function withdrawContribution(uint64 _eventId) external nonReentrant {
         CrowdFundingEvent storage chosenEvent = _getEventDetails(_eventId);
         // Check if the funding goal has not been reached, if it has user can't take out their contribution
         require(!_isFundingGoalReached(chosenEvent), "Funding goal has been reached!");
@@ -197,7 +197,7 @@ contract CrowdFunding2 is Ownable, ReentrancyGuard {
     /// @notice This function is responsible for giving the event creator on a successfully funding event
     /// @dev Implemented this with caution and added necessary checks to ensure event creator cannot run away with funds
     /// @param _eventId Is the ID of the event, produced during creation of event or retrieved by getAllEvents() & ongoingEvents
-    function releaseFundsToEventOwner(uint256 _eventId) external payable onlyEventCreator(_eventId) nonReentrant {
+    function releaseFundsToEventOwner(uint256 _eventId) external onlyEventCreator(_eventId) nonReentrant {
         CrowdFundingEvent storage chosenEvent = _getEventDetails(_eventId);
         require(chosenEvent.Status == EventStatus.Completed, "This event is not completed!");
         require(chosenEvent.totalAmountRaised >= chosenEvent.FundingGoal, "Funding goal has not reached!");
@@ -235,7 +235,7 @@ contract CrowdFunding2 is Ownable, ReentrancyGuard {
     /// @param _eventId Is the ID of the event, produced during creation of event or retrieved by getAllEvents() & ongoingEvents
     /// @param _milestoneName This is the name you can give to your milestone, ex: Goal 1
     /// @param _milestoneTargetAmount This is the monotary goalpost that your aiming to reach on your way 100% successfully funded
-    function addMilestone(uint32 _eventId, string calldata _milestoneName, uint32 _milestoneTargetAmount) external payable onlyEventCreator(_eventId) {
+    function addMilestone(uint32 _eventId, string calldata _milestoneName, uint32 _milestoneTargetAmount) external onlyEventCreator(_eventId) {
         // Checks to see that the eventId(also an index) is within the bounds of our ongoingEvents array. If the array has a total od just 9 items and you set eventId to 10 then you would be outside the bounds
         require(_eventId < ongoingEvents.length, "Event does not exist or has already completed!");
         // Add a upper limit to the milestones a user can create for an event to reduce dynamic data entry
@@ -258,7 +258,7 @@ contract CrowdFunding2 is Ownable, ReentrancyGuard {
     /// @dev We loop through the milestone of a specific event and remove the index we want
     /// @param _eventId Is the ID of the event, produced during creation of event or retrieved by getAllEvents() & ongoingEvents
     /// @param _milestoneIndex Is the index of the milestone object that we want to remove from our list of milestones associated with our specified event
-    function removeMilestone(uint256 _eventId, uint256 _milestoneIndex) external payable onlyEventCreator(_eventId) {
+    function removeMilestone(uint256 _eventId, uint256 _milestoneIndex) external onlyEventCreator(_eventId) {
         // Checks to see that the eventId(also an index) is within the bounds of our ongoingEvents array. If the array has a total of just 9 items and you set eventId to 10 then you would be outside the bounds
         require(_eventId < ongoingEvents.length, "Event ID is not valid");
         // Check to see that the index is within the bounds of our list of all the milestones associated with the specified event
@@ -278,7 +278,7 @@ contract CrowdFunding2 is Ownable, ReentrancyGuard {
     /// @dev This feature may also be set to automatically set the status of an event, currently access control is provided to the creator of the event, possibility to add onto this functionality
     /// @param _eventId Is the ID of the event, produced during creation of event or retrieved by getAllEvents() & ongoingEvents
     /// @param _status Is the status of event, 3 Statuses: 0=Active(Default), 1=Cancelled & 2=Successful
-    function setEventStatus(uint _eventId, EventStatus _status) external payable onlyEventCreator(_eventId) {
+    function setEventStatus(uint _eventId, EventStatus _status) external onlyEventCreator(_eventId) {
         CrowdFundingEvent storage chosenEvent = _getEventDetails(_eventId);
         // Sets the status of the event to one of three: Active, Cancelled, Completed
         chosenEvent.Status = _status;
