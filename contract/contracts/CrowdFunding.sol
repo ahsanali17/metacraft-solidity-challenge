@@ -193,7 +193,6 @@ contract CrowdFunding2 is Ownable, ReentrancyGuard {
         return ongoingEvents;
     }
 
-
     /// @notice This function is responsible for giving the event creator on a successfully funding event
     /// @dev Implemented this with caution and added necessary checks to ensure event creator cannot run away with funds
     /// @param _eventId Is the ID of the event, produced during creation of event or retrieved by getAllEvents() & ongoingEvents
